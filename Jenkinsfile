@@ -10,13 +10,6 @@ pipeline {
                 }
             }
 
-        stage('Test') {
-
-
-            
-        }
-            
-
             steps {
                 sh '''
                     ls -la
@@ -27,6 +20,11 @@ pipeline {
                     ls -la
                 '''
             }
+        }
+
+        stage('Test') {
+
+   
         }
     }
 }
