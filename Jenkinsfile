@@ -9,6 +9,10 @@ pipeline {
                     reuseNode true
                 }
             }
+
+        stage('Test')
+            echo "Test stage"
+
             steps {
                 sh '''
                     ls -la
