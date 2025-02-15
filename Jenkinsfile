@@ -5,7 +5,6 @@ pipeline {
         NETLIFY_SITE_ID = '9d6ed1b9-4732-4678-8c03-84517fc26fd6'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
         REACT_APP_VERSION = "1.0.$BUILD_ID"
-
     }
 
     stages {
@@ -82,7 +81,6 @@ pipeline {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-
                     reuseNode true
                 }
             }
@@ -90,18 +88,17 @@ pipeline {
             environment {
                 CI_ENVIRONMENT_URL = 'https://poetic-fox-124bc1.netlify.app'
             }
+
             steps {
                 sh '''
-                    npm install netlify-cli
+                    npm install netlify-cli node-jq
                     node_modules/.bin/netlify --version
                     echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
                     CI_ENVIRONMENT_URL=$(node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json)
                     npx playwright test  --reporter=html
-
                 '''
-            
             }
 
             post {
@@ -122,8 +119,10 @@ pipeline {
             environment {
                 CI_ENVIRONMENT_URL = 'https://poetic-fox-124bc1.netlify.app'
             }
+
             steps {
                 sh '''
+                    node --version
                     npm install netlify-cli
                     node_modules/.bin/netlify --version
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
@@ -132,7 +131,7 @@ pipeline {
                     npx playwright test  --reporter=html
                 '''
             }
-        
+
             post {
                 always {
                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Prod E2E', reportTitles: '', useWrapperFileDirectly: true])
@@ -140,5 +139,4 @@ pipeline {
             }
         }
     }
-
-
+}
